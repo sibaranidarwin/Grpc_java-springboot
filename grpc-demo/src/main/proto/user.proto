@@ -14,6 +14,20 @@ message UserResponse {
   string umur = 4;
 }
 
+// Message for the CreateUser request
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+}
+
+// Message for the CreateUser response
+message CreateUserResponse {
+  int32 id = 1; // Assuming the server will generate and return an ID for the new user
+  string message = 2; // Optional: success message or other info
+}
+
 service UserService {
   rpc GetUser (UserRequest) returns (UserResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
 }
+

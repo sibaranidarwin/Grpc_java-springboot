@@ -10,38 +10,40 @@ import net.devh.boot.grpc.server.service.GrpcService;
 @GrpcService
 public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
 
-    @PostConstruct
-    public void init() {
-        System.out.println("gRPC Server initialized...");
+    @Override
+    public void getUser(UserProto.UserRequest request, StreamObserver<UserProto.UserResponse> responseObserver) {
+        // Implementasikan logika untuk mencari atau mengembalikan data pengguna
+        if (request.getId() == 1) {
+            UserProto.UserResponse response = UserProto.UserResponse.newBuilder()
+                    .setId(1)
+                    .setName("John Doe")
+                    .setEmail("johndoe@example.com")
+                    .setUmur("30")
+                    .build();
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } else {
+            responseObserver.onError(new RuntimeException("User not found"));
+        }
     }
 
     @Override
-    public void getUser(UserProto.UserRequest request, StreamObserver<UserProto.UserResponse> responseObserver) {
-        // Mulai catat waktu respons
-        long startTime = System.currentTimeMillis();
-        System.out.println("Request received at: " + startTime + " ms");
-        UserProto.UserResponse userResponse = null;
+    public void createUser(UserProto.CreateUserRequest request, StreamObserver<UserProto.CreateUserResponse> responseObserver) {
 
-        if (request.getId() == 1){
-        // Proses permintaan dan buat respons
-            userResponse = UserProto.UserResponse.newBuilder()
-                    .setId(request.getId())
-                    .setName("John Doe")
-                    .setEmail("johndoe@example.com")
-                    .setUmur("890")
-                    .build();
-        }
+        int generateduserid = generateuserid();
 
-        // Kirim respons ke klien
-        responseObserver.onNext(userResponse);
+        UserProto.CreateUserResponse response = UserProto.CreateUserResponse.newBuilder()
+                .setId(generateduserid)
+                .setMessage("Info Success")
+                .build();
+
+        responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
 
-        // Catat waktu respons selesai
-        long endTime = System.currentTimeMillis();
-        System.out.println("Response sent at: " + endTime + " ms");
 
-        // Hitung waktu yang dibutuhkan untuk respons
-        long responseTime = endTime - startTime;
-        System.out.println("Response time: " + responseTime + " ms");
+
+    private int generateuserid(){
+        return (int) (Math.random() * 1000);
     }
 }
